@@ -57,6 +57,51 @@ def dist_vincenty(Coord1,Coord2,nb_iter=10):
     return d
 
 
+def statperday(Caches):
+    """ gives per day statistic:
+        - Maximum number of caches
+        - Maximum distance
+        Caches is a dom list sorted by found date """
+
+    MaxDist = 0.0
+    MaxDist2 = 0.0
+    MaxNbCaches = 0
+    MaxNbCaches2 = 0
+    currdate = Caches[0].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
+    currdist = 0.0
+    currnbcaches = 1
+    lat0 = float(Caches[0].attributes['lat'].value)
+    long0 = float(Caches[0].attributes['lon'].value)
+
+    for k in range(1,Caches.length):
+        newdate = Caches[k].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
+        lat1 = float(Caches[k].attributes['lat'].value)
+        long1 = float(Caches[k].attributes['lon'].value)
+        if newdate == currdate:
+            currnbcaches += 1
+            currdist += dist_vincenty([lat0,long0],[lat1,long1])
+        else:
+            if currnbcaches > MaxNbCaches:
+                MaxNbCaches2 = MaxNbCaches
+                MaxNbCaches = currnbcaches
+                DateMaxNbCaches = currdate
+            elif currnbcaches > MaxNbCaches2:
+                MaxNbCaches2 = currnbcaches
+            if currdist > MaxDist:
+                MaxDist2 = MaxDist
+                MaxDist = currdist
+                DateMaxDist = currdate
+            elif currdist > MaxDist2:
+                MaxDist2 = currdist
+            currdist = 0.0
+            currnbcaches = 1
+            currdate = newdate
+        lat0 = lat1
+        long0 = long1
+    print("Distances in 1 day:",MaxDist, DateMaxDist, MaxDist2)
+    print("Number of caches in 1 day:", MaxNbCaches, DateMaxNbCaches, MaxNbCaches2)
+
+
 fichier = '4662145.gpx'
 
 mygpx = minidom.parse(fichier)
@@ -79,3 +124,6 @@ for k in range(1,NbCaches):
     lat0 = lat1
     long0 = long1
 print("Total distance from cache to cache:",dist_tot,"km")
+
+# statistics per day
+statperday(Caches)
