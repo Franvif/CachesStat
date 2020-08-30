@@ -9,7 +9,18 @@ def sortcaches(Caches):
                 '0'*(16-len(x.getElementsByTagName('groundspeak:log')[0].attributes['id'].value)) +
                 x.getElementsByTagName('groundspeak:log')[0].attributes['id'].value)
 
+
+def removeotherlogs(Caches):
+    """ removes logs that are not "found it" or "Attended" """
     
+    for cache in Caches:
+        a = cache.getElementsByTagName('groundspeak:logs')[0]
+        listelogs = a.getElementsByTagName('groundspeak:log')
+        for log in listelogs:
+            if not (log.getElementsByTagName('groundspeak:type')[0].firstChild.data in {'Found it','Attended'}):
+                a.removeChild(log)
+                
+
 def dist_vincenty(Coord1,Coord2,nb_iter=10):
     """ calcul de la distance entre deux points de la terre (en km)
     Coord1 et Coord2 contiennent les coordonnées
@@ -107,6 +118,10 @@ fichier = '4662145.gpx'
 mygpx = minidom.parse(fichier)
 Caches = mygpx.getElementsByTagName('wpt')
 
+# remove logs other than "Found it" or "Attended"
+removeotherlogs(Caches)
+
+# total number of caches
 NbCaches = Caches.length
 print("Number of found caches: ",NbCaches)
 
