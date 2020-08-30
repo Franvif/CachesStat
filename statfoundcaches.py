@@ -19,7 +19,17 @@ def removeotherlogs(Caches):
         for log in listelogs:
             if not (log.getElementsByTagName('groundspeak:type')[0].firstChild.data in {'Found it','Attended'}):
                 a.removeChild(log)
-                
+
+
+def timezone(Caches):
+    """ adjust date to time zone Paris to avoid border effect
+        We considere transition between summer time and winter time 31/10 and 31/03: TO IMPROVE!!"""
+
+    for cache in Caches:
+        dateheure = cache.getElementsByTagName('groundspeak:date')[0].firstChild.data
+        if (dateheure[5:7] in {'04','05','06','07','08','09','10'} and dateheure[11:13] in {'00','01'}) or (dateheure[5:7] in {'11','12','01','02','03'} and dateheure[11:13] == '00'):
+            cache.getElementsByTagName('groundspeak:date')[0].firstChild.data = dateheure[0:8] + "{0:02d}".format(int(dateheure[8:10])-1) + dateheure[10:]
+
 
 def dist_vincenty(Coord1,Coord2,nb_iter=10):
     """ calcul de la distance entre deux points de la terre (en km)
@@ -120,6 +130,9 @@ Caches = mygpx.getElementsByTagName('wpt')
 
 # remove logs other than "Found it" or "Attended"
 removeotherlogs(Caches)
+
+# adjust date for paris time zone
+timezone(Caches)
 
 # total number of caches
 NbCaches = Caches.length
