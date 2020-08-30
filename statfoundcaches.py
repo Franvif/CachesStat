@@ -119,6 +119,19 @@ def statperday(Caches):
             currdate = newdate
         lat0 = lat1
         long0 = long1
+    # we do it again for the last date
+    if currnbcaches > MaxNbCaches:
+        MaxNbCaches2 = MaxNbCaches
+        MaxNbCaches = currnbcaches
+        DateMaxNbCaches = currdate
+    elif currnbcaches > MaxNbCaches2:
+        MaxNbCaches2 = currnbcaches
+    if currdist > MaxDist:
+        MaxDist2 = MaxDist
+        MaxDist = currdist
+        DateMaxDist = currdate
+    elif currdist > MaxDist2:
+        MaxDist2 = currdist
     print("Distances in 1 day:",MaxDist, DateMaxDist, MaxDist2)
     print("Number of caches in 1 day:", MaxNbCaches, DateMaxNbCaches, MaxNbCaches2)
 
