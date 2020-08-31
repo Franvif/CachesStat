@@ -89,6 +89,8 @@ def statperday(Caches):
     MaxNbCaches = 0
     MaxNbCaches2 = 0
     currdate = Caches[0].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
+    DateMaxNbCaches = currdate
+    DateMaxDist = currdate
     currdist = 0.0
     currnbcaches = 1
     lat0 = float(Caches[0].attributes['lat'].value)
@@ -105,15 +107,19 @@ def statperday(Caches):
             if currnbcaches > MaxNbCaches:
                 MaxNbCaches2 = MaxNbCaches
                 MaxNbCaches = currnbcaches
+                DateMaxNbCaches2 = DateMaxNbCaches
                 DateMaxNbCaches = currdate
             elif currnbcaches > MaxNbCaches2:
                 MaxNbCaches2 = currnbcaches
+                DateMaxNbCaches2 = currdate
             if currdist > MaxDist:
                 MaxDist2 = MaxDist
                 MaxDist = currdist
+                DateMaxDist2 = DateMaxDist
                 DateMaxDist = currdate
             elif currdist > MaxDist2:
                 MaxDist2 = currdist
+                DateMaxDist2 = currdate
             currdist = 0.0
             currnbcaches = 1
             currdate = newdate
@@ -132,8 +138,8 @@ def statperday(Caches):
         DateMaxDist = currdate
     elif currdist > MaxDist2:
         MaxDist2 = currdist
-    print("Distances in 1 day:",MaxDist, DateMaxDist, MaxDist2)
-    print("Number of caches in 1 day:", MaxNbCaches, DateMaxNbCaches, MaxNbCaches2)
+    print("Distances in 1 day {0:.1f}km on {1:s}, {2:.1f}km on {3:s}".format(MaxDist, DateMaxDist, MaxDist2, DateMaxDist2))
+    print("Number of caches in 1 day: {0:d} on {1:s}, {2:d} on {3:s}".format(MaxNbCaches, DateMaxNbCaches, MaxNbCaches2, DateMaxNbCaches2))
 
 
 fichier = '4662145.gpx'
