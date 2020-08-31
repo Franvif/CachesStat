@@ -95,6 +95,7 @@ def statperday(Caches):
     currnbcaches = 1
     lat0 = float(Caches[0].attributes['lat'].value)
     long0 = float(Caches[0].attributes['lon'].value)
+    listperday = []
 
     for k in range(1,Caches.length):
         newdate = Caches[k].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
@@ -104,42 +105,20 @@ def statperday(Caches):
             currnbcaches += 1
             currdist += dist_vincenty([lat0,long0],[lat1,long1])
         else:
-            if currnbcaches > MaxNbCaches:
-                MaxNbCaches2 = MaxNbCaches
-                MaxNbCaches = currnbcaches
-                DateMaxNbCaches2 = DateMaxNbCaches
-                DateMaxNbCaches = currdate
-            elif currnbcaches > MaxNbCaches2:
-                MaxNbCaches2 = currnbcaches
-                DateMaxNbCaches2 = currdate
-            if currdist > MaxDist:
-                MaxDist2 = MaxDist
-                MaxDist = currdist
-                DateMaxDist2 = DateMaxDist
-                DateMaxDist = currdate
-            elif currdist > MaxDist2:
-                MaxDist2 = currdist
-                DateMaxDist2 = currdate
+            listperday.append((currdate, currnbcaches, currdist))
             currdist = 0.0
             currnbcaches = 1
             currdate = newdate
         lat0 = lat1
         long0 = long1
     # we do it again for the last date
-    if currnbcaches > MaxNbCaches:
-        MaxNbCaches2 = MaxNbCaches
-        MaxNbCaches = currnbcaches
-        DateMaxNbCaches = currdate
-    elif currnbcaches > MaxNbCaches2:
-        MaxNbCaches2 = currnbcaches
-    if currdist > MaxDist:
-        MaxDist2 = MaxDist
-        MaxDist = currdist
-        DateMaxDist = currdate
-    elif currdist > MaxDist2:
-        MaxDist2 = currdist
-    print("Distances in 1 day {0:.1f}km on {1:s}, {2:.1f}km on {3:s}".format(MaxDist, DateMaxDist, MaxDist2, DateMaxDist2))
-    print("Number of caches in 1 day: {0:d} on {1:s}, {2:d} on {3:s}".format(MaxNbCaches, DateMaxNbCaches, MaxNbCaches2, DateMaxNbCaches2))
+    listperday.append((currdate, currnbcaches, currdist))
+
+    a = sorted(listperday, key = lambda x:x[2]) # sort by km
+    print("Distances in 1 day {0:.1f}km on {1:s}, {2:.1f}km on {3:s}".format(a[-1][2], a[-1][0], a[-2][2], a[-2][0]))
+    a = sorted(listperday, key=lambda x: x[1])  # sort by nb caches
+    print("Number of caches in 1 day: {0:d} on {1:s}, {2:d} on {3:s}".format(a[-1][1], a[-1][0], a[-2][1], a[-2][0]))
+    return listperday
 
 
 fichier = '4662145.gpx'
@@ -173,4 +152,4 @@ for k in range(1,NbCaches):
 print("Total distance from cache to cache:",dist_tot,"km")
 
 # statistics per day
-statperday(Caches)
+listperday = statperday(Caches)
