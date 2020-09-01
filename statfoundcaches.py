@@ -1,6 +1,6 @@
 from xml.dom import minidom
 import numpy as np
-
+from urllib.request import urlopen
 
 def sortcaches(Caches):
     """ sort caches by found date and id if same found date"""
@@ -29,6 +29,18 @@ def timezone(Caches):
         dateheure = cache.getElementsByTagName('groundspeak:date')[0].firstChild.data
         if (dateheure[5:7] in {'04','05','06','07','08','09','10'} and dateheure[11:13] in {'00','01'}) or (dateheure[5:7] in {'11','12','01','02','03'} and dateheure[11:13] == '00'):
             cache.getElementsByTagName('groundspeak:date')[0].firstChild.data = dateheure[0:8] + "{0:02d}".format(int(dateheure[8:10])-1) + dateheure[10:]
+
+
+def addgeo(Caches):
+    """ add information on location:
+        Country, state, county, city..."""
+
+    for cache in Caches:
+        lat = float(cache.attributes['lat'].value)
+        long = float(cache.attributes['lon'].value)
+        gpxgeo = minidom.parseString(urlopen('https://nominatim.openstreetmap.org/reverse?format=xml&lat={0:f}&lon={1:f}&zoom=18&addressdetails=1/'.format(lat,long)).read())
+        geoelem = gpxgeo.getElementsByTagName('reversegeocode')[0]
+        cache.appendChild(geoelem)
 
 
 def dist_vincenty(Coord1,Coord2,nb_iter=10):
@@ -125,6 +137,9 @@ fichier = '4662145.gpx'
 
 mygpx = minidom.parse(fichier)
 Caches = mygpx.getElementsByTagName('wpt')
+
+# add geographic informations
+addgeo(Caches)
 
 # remove logs other than "Found it" or "Attended"
 removeotherlogs(Caches)
