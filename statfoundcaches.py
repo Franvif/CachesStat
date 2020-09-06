@@ -1,6 +1,7 @@
 from xml.dom import minidom
 import numpy as np
 from urllib.request import urlopen
+import os.path
 
 def sortcaches(Caches):
     """ sort caches by found date and id if same found date"""
@@ -31,16 +32,48 @@ def timezone(Caches):
             cache.getElementsByTagName('groundspeak:date')[0].firstChild.data = dateheure[0:8] + "{0:02d}".format(int(dateheure[8:10])-1) + dateheure[10:]
 
 
-def addgeo(Caches):
-    """ add information on location:
-        Country, state, county, city..."""
+def gpxaddress(Caches, fichier = 'cachesadresses.gpx'):
+    """ Create or complete a gpx file with the adress corresponding to the
+        coordinates of the caches"""
 
+    if not os.path.isfile(fichier):
+        # creation of the gpx file
+        doc = minidom.Document()
+        rootgpx = doc.createElement('gpx')
+        doc.appendChild(rootgpx)
+    else:
+        # opening of the file
+        doc = minidom.parse(fichier)
+        rootgpx = doc.firstChild
+    wptaddr = doc.getElementsByTagName('wpt')
+    
+    # create a list with coordinates already in gpx file
+    listcoord = []
+    for wpt in wptaddr:
+        listcoord.append((float(wpt.attributes['lat'].value),float(wpt.attributes['lon'].value)))
+        
+    # for each cache, we loog if coords are in the list. If yes, we add the reversegeocode to the cache, If no, we query it and add it
     for cache in Caches:
         lat = float(cache.attributes['lat'].value)
         long = float(cache.attributes['lon'].value)
-        gpxgeo = minidom.parseString(urlopen('https://nominatim.openstreetmap.org/reverse?format=xml&lat={0:f}&lon={1:f}&zoom=18&addressdetails=1/'.format(lat,long)).read())
-        geoelem = gpxgeo.getElementsByTagName('reversegeocode')[0]
-        cache.appendChild(geoelem)
+        if (lat,long) in listcoord:
+            k = listcoord.index((lat,long))
+            cache.appendChild(wptaddr[k].getElementsByTagName('reversegeocode')[0].cloneNode(deep=True))
+        else:
+            gpxgeo = minidom.parseString(urlopen('https://nominatim.openstreetmap.org/reverse?format=xml&lat={0:f}&lon={1:f}&zoom=18&addressdetails=1/'.format(lat,long)).read())
+            gpxgeo2 = gpxgeo.cloneNode(deep=True)
+            if len(cache.getElementsByTagName('reversegeocode')) == 0:
+                cache.appendChild(gpxgeo.firstChild)
+            wpt = doc.createElement('wpt')
+            wpt.setAttribute('lat','{0:f}'.format(lat))
+            wpt.setAttribute('lon','{0:f}'.format(long))
+            wpt.appendChild(gpxgeo2.firstChild)
+            rootgpx.appendChild(wpt)
+            
+    with open(fichier,'wb') as fid:
+        fid.write(doc.toxml('UTF-8')) # UTF-8 else gpx is not readable with minidom (windows)
+    return doc
+
 
 
 def dist_vincenty(Coord1,Coord2,nb_iter=10):
