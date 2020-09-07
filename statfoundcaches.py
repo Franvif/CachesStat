@@ -166,19 +166,39 @@ def statperday(Caches):
     return listperday
 
 
+def statpercarac(Caches,carac,disp = False):
+    """ gives repartition according to a caracteristic such as cache size, difficulty, type, country..."""
+
+    dic_carac = {}
+    for cache in Caches:
+        carac_elem = cache.getElementsByTagName(carac)
+        if len(carac_elem)>0:
+            carac_value = cache.getElementsByTagName(carac)[0].firstChild.data
+        else:
+            carac_value = 'carac_unknown'
+
+        if carac_value in dic_carac.keys():
+            dic_carac[carac_value] += 1
+        else:
+            dic_carac[carac_value] = 1
+    if disp:
+        for carac_value, tot in dic_carac.items():
+            print('{0:s} : {1:d}'.format(carac_value,tot))
+    return dic_carac
+
 fichier = '4662145.gpx'
 
 mygpx = minidom.parse(fichier)
 Caches = mygpx.getElementsByTagName('wpt')
-
-# add geographic informations
-addgeo(Caches)
 
 # remove logs other than "Found it" or "Attended"
 removeotherlogs(Caches)
 
 # adjust date for paris time zone
 timezone(Caches)
+
+# add geographic informations (country, ...)
+gpxaddress(Caches)
 
 # total number of caches
 NbCaches = Caches.length
@@ -201,3 +221,9 @@ print("Total distance from cache to cache:",dist_tot,"km")
 
 # statistics per day
 listperday = statperday(Caches)
+
+# stat per type
+dictype = statpercarac(Caches,'groundspeak:type',disp=True)
+dicsize = statpercarac(Caches,'groundspeak:container',disp=True)
+diccountry = statpercarac(Caches,'country',disp=True)
+diccounty = statpercarac(Caches,'county',disp=True)
