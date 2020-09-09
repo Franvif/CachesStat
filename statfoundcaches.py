@@ -167,15 +167,22 @@ def statperday(Caches):
 
 
 def statpercarac(Caches,carac,disp = False):
-    """ gives repartition according to a caracteristic such as cache size, difficulty, type, country..."""
+    """ gives repartition according to a caracteristic such as cache size, difficulty, type, country...
+        carac can be a tuple containing several caracteritics"""
 
     dic_carac = {}
+    if not type(carac) is tuple:
+        carac = (carac,)
+
     for cache in Caches:
-        carac_elem = cache.getElementsByTagName(carac)
-        if len(carac_elem)>0:
-            carac_value = cache.getElementsByTagName(carac)[0].firstChild.data
-        else:
-            carac_value = 'carac_unknown'
+        carac_value_list = []
+        for k in range(len(carac)):
+            carac_elem = cache.getElementsByTagName(carac[k])
+            if len(carac_elem)>0:
+                carac_value_list.append(carac_elem[0].firstChild.data)
+            else:
+                carac_value_list.append('carac_unknown')
+        carac_value = tuple(carac_value_list)
 
         if carac_value in dic_carac.keys():
             dic_carac[carac_value] += 1
@@ -183,7 +190,9 @@ def statpercarac(Caches,carac,disp = False):
             dic_carac[carac_value] = 1
     if disp:
         for carac_value, tot in dic_carac.items():
-            print('{0:s} : {1:d}'.format(carac_value,tot))
+            for c in carac_value:
+                print('{0:s} '.format(c), end='')
+            print(': {0:d}'.format(tot))
     return dic_carac
 
 fichier = '4662145.gpx'
