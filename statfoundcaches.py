@@ -2,6 +2,7 @@ from xml.dom import minidom
 import numpy as np
 from urllib.request import urlopen
 import os.path
+import datetime
 
 def sortcaches(Caches):
     """ sort caches by found date and id if same found date"""
@@ -166,6 +167,15 @@ def statperday(Caches):
     return listperday
 
 
+def istag(Caches,tag):
+    """ print caches in Caches whose tag is absent"""
+
+    for cache in Caches:
+        a = cache.getElementsByTagName(tag)
+        if len(a)==0:
+            print(cache.getElementsByTagName('desc')[0].firstChild.data)
+
+
 def statpercarac(Caches,carac,disp = False):
     """ gives repartition according to a caracteristic such as cache size, difficulty, type, country...
         carac can be a tuple containing several caracteritics"""
@@ -194,6 +204,24 @@ def statpercarac(Caches,carac,disp = False):
                 print('{0:s} '.format(c), end='')
             print(': {0:d}'.format(tot))
     return dic_carac
+
+
+def nbdaysfornbcaches(Caches,nbcaches):
+    """ outputs 2 lists with one with date and one with number of days up to this date to have nbcaches found
+        Input Caches contains caches in the order they are found"""
+
+    currdatestr = Caches[0].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
+    currdate = datetime.date(year=int(currdatestr[0:4]), month=int(currdatestr[5:7]), day=int(currdatestr[8:10]))
+    listedate = []
+    listenbdays = []
+    for k in range(nbcaches-1,len(Caches)):
+        listedate.append(Caches[k].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10])
+        newdate = datetime.date(year=int(listedate[-1][0:4]), month=int(listedate[-1][5:7]), day=int(listedate[-1][8:10]))
+        olddatestr = Caches[k-nbcaches+1].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
+        olddate = datetime.date(year=int(olddatestr[0:4]), month=int(olddatestr[5:7]), day=int(olddatestr[8:10]))
+        listenbdays.append((newdate - olddate).days+1)
+    return listedate, listenbdays
+
 
 fichier = '4662145.gpx'
 
