@@ -124,10 +124,26 @@ def dist_vincenty(Coord1,Coord2,nb_iter=10):
     return d
 
 
+def totaldist(Caches):
+    """ gives the total distance from cache to cache in the order of the list """
+
+    dist_tot = 0.0
+    lat0 = float(Caches[0].attributes['lat'].value)
+    long0 = float(Caches[0].attributes['lon'].value)
+    for cache in Caches[1:]:
+        lat1 = float(cache.attributes['lat'].value)
+        long1 = float(cache.attributes['lon'].value)
+        dist_tot = dist_tot + dist_vincenty([lat0,long0],[lat1,long1])
+        lat0 = lat1
+        long0 = long1
+    return dist_tot
+
+
 def statperday(Caches):
     """ gives per day statistic:
-        - Maximum number of caches
-        - Maximum distance
+        - number of caches
+        - distance
+        Output is a list of lists with the date and the previously cited metrics
         Caches is a dom list sorted by found date """
 
     MaxDist = 0.0

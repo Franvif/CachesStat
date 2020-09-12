@@ -24,15 +24,7 @@ print("Number of found caches: ",NbCaches)
 sortcaches(Caches)
 
 # calculate total distance
-dist_tot = 0.0
-lat0 = float(Caches[0].attributes['lat'].value)
-long0 = float(Caches[0].attributes['lon'].value)
-for k in range(1,NbCaches):
-    lat1 = float(Caches[k].attributes['lat'].value)
-    long1 = float(Caches[k].attributes['lon'].value)
-    dist_tot = dist_tot + dist_vincenty([lat0,long0],[lat1,long1])
-    lat0 = lat1
-    long0 = long1
+dist_tot = totaldist(Caches)
 print("Total distance from cache to cache:",dist_tot,"km")
 
 # statistics per day
