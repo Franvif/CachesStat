@@ -1,2 +1,3 @@
 *.gpx
 .idea/
+__pycache__/
