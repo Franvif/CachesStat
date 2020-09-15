@@ -2,6 +2,7 @@ from statfoundcaches import *
 from xml.dom import minidom
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
 
 
 fichier = '4662145.gpx'
@@ -40,11 +41,12 @@ diccounty = statpercarac(Caches,'county',disp=True)
 
 # number of days for 100 caches
 listedate,listenbdays = nbdaysfornbcaches(Caches,100)
-ax = plt.subplot(111)
-plt.plot(listenbdays)
+date0 = datetime.date(year=int(listedate[0][0:4]), month=int(listedate[0][5:7]), day=int(listedate[0][8:10]))
+listedeltadays = [(datetime.date(year=int(currdate[0:4]), month=int(currdate[5:7]), day=int(currdate[8:10]))-date0).days for currdate in listedate]
+plt.plot(listedeltadays,listenbdays)
 plt.ylabel('Number of days')
-locxticks = np.arange(0,NbCaches,NbCaches/8,dtype=int)
-xtickslabel = [listedate[k] for k in locxticks]
+locxticks = np.arange(0,listedeltadays[-1]+1,listedeltadays[-1]/12,dtype=int)
+xtickslabel = [(date0+datetime.timedelta(int(delta))).strftime('%y/%m/%d') for delta in locxticks]
 plt.xticks(locxticks,xtickslabel,rotation=70)
 plt.grid(True)
 plt.title('Number of days to find the last 100 caches')
