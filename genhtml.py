@@ -31,7 +31,11 @@ class dochtml:
         """ create the html file"""
 
         if self.typedoc == 'root':
-            preamble = "<html>\n  <head>\n    <title>Geocaching stat by Franvif</title>\n  </head>\n  <body>\n"
+            preamble = "<html>\n  <head>\n    <title>Geocaching stat by Franvif</title>\n" \
+                       "    <style>\n      table, th, td {\n      padding: 10px;\n" \
+                       "      border: 2px solid black;\n      border-collapse: collapse;\n" \
+                       "      }\n    </style>\n" \
+                       "  </head>\n  <body>\n"
             postamble = "  </body>\n</html>"
             body = ""
             for doc in self.children:
@@ -57,6 +61,9 @@ class dochtml:
                     body = body + "    </tr>\n"
                 numcell += 1
             return preamble + body + postamble
+        elif self.typedoc == 'image':
+            return '<img src="' + self.content + '" />'
+
 
 
 
