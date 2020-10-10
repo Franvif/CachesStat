@@ -82,5 +82,11 @@ tab1.addchild(dochtml(typedoc='text', content='{0} days ({1})'.format(listenbday
 tab1.addchild(dochtml(typedoc='text', content='Last 1000 caches'))
 tab1.addchild(dochtml(typedoc='text', content='{0} days ({1})'.format(listenbdays[-1],listedate[-1])))
 
+# series
+(nbdaysfinds, datesuite), (nbdaysnofinds, datenosuite) = consecutivedays(Caches)
+tab1.addchild(dochtml(typedoc='text', content='Maximum consecutive days with finds'))
+tab1.addchild(dochtml(typedoc='text', content='{0} days (last: {1})'.format(nbdaysfinds,datesuite)))
+tab1.addchild(dochtml(typedoc='text', content='Maximum consecutive days without any finds'))
+tab1.addchild(dochtml(typedoc='text', content='{0} days (last: {1})'.format(nbdaysnofinds,datenosuite)))
 
 doc.writehtmlfile(fichierhtml)

@@ -220,8 +220,6 @@ def nbdaysfornbcaches(Caches,nbcaches):
     """ outputs 2 lists with one with date and one with number of days up to this date to have nbcaches found
         Input Caches contains caches in the order they are found"""
 
-    currdatestr = Caches[0].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
-    currdate = datetime.date(year=int(currdatestr[0:4]), month=int(currdatestr[5:7]), day=int(currdatestr[8:10]))
     listedate = []
     listenbdays = []
     for k in range(nbcaches-1,len(Caches)):
@@ -233,3 +231,35 @@ def nbdaysfornbcaches(Caches,nbcaches):
     return listedate, listenbdays
 
 
+def consecutivedays(Caches):
+    """ Input: Caches are the caches in the order they are found
+        Outputs: maximum consecutive days with at least one find and the date of the last find (in a tuple)
+                 maximum consecutive days without a find and the date of the last day of the serie (in another tuple)"""
+
+    maxdaysfinds = 0
+    maxdaysnofinds = 0
+    currdaysfinds = 1
+    currdatestr = Caches[0].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
+    currdate = datetime.date(year=int(currdatestr[0:4]), month=int(currdatestr[5:7]), day=int(currdatestr[8:10]))
+    currdatefinds = currdatestr
+    for cache in Caches:
+        olddate = currdate
+        currdatestr = cache.getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
+        currdate = datetime.date(year=int(currdatestr[0:4]), month=int(currdatestr[5:7]), day=int(currdatestr[8:10]))
+        deltadate = (currdate - olddate).days
+        if deltadate == 1:
+            currdaysfinds += 1
+            currdatefinds = currdatestr
+        elif deltadate > 1:
+            if currdaysfinds > maxdaysfinds:
+                maxdaysfinds = currdaysfinds
+                maxdaysfindsdate = currdatefinds
+            if deltadate - 1 > maxdaysnofinds:
+                maxdaysnofinds = deltadate - 1
+                maxdaysnofindsdate = (currdate-datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+            currdaysfinds = 1
+            currdatefinds = currdatestr
+    if currdaysfinds > maxdaysfinds:
+        maxdaysfinds = currdaysfinds
+        maxdaysfindsdate = currdatefinds
+    return (maxdaysfinds, maxdaysfindsdate), (maxdaysnofinds, maxdaysnofindsdate)
