@@ -146,13 +146,7 @@ def statperday(Caches):
         Output is a list of lists with the date and the previously cited metrics
         Caches is a dom list sorted by found date """
 
-    MaxDist = 0.0
-    MaxDist2 = 0.0
-    MaxNbCaches = 0
-    MaxNbCaches2 = 0
     currdate = Caches[0].getElementsByTagName('groundspeak:date')[0].firstChild.data[0:10]
-    DateMaxNbCaches = currdate
-    DateMaxDist = currdate
     currdist = 0.0
     currnbcaches = 1
     lat0 = float(Caches[0].attributes['lat'].value)
