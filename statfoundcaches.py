@@ -265,14 +265,69 @@ def consecutivedays(Caches):
         maxdaysfindsdate = currdatefinds
     return (maxdaysfinds, maxdaysfindsdate), (maxdaysnofinds, maxdaysnofindsdate)
 
+
 def cachesonmap(Caches, htmlfile):
     """ Display caches on an interactive map. Html file is saved in htmlfile """
 
     m = folium.Map([45.4, 5.6], zoom_start=8, tiles='Stamen Terrain')
+    tradi = folium.FeatureGroup(name='Traditional', show=True)
+    m.add_child(tradi)
+    myste = folium.FeatureGroup(name='Unknown', show=True)
+    m.add_child(myste)
+    multi = folium.FeatureGroup(name='Multi', show=True)
+    m.add_child(multi)
+    letter = folium.FeatureGroup(name='Letterbox', show=True)
+    m.add_child(letter)
+    earth = folium.FeatureGroup(name='Earthcache', show=True)
+    m.add_child(earth)
+    virt = folium.FeatureGroup(name='Virtual', show=True)
+    m.add_child(virt)
+    wigo = folium.FeatureGroup(name='Where I go', show=True)
+    m.add_child(wigo)
+    event = folium.FeatureGroup(name='Event', show=True)
+    m.add_child(event)
+    other = folium.FeatureGroup(name='Other', show=True)
+    m.add_child(other)
+    
     for cache in Caches:
-        folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+        cachetype = cache.getElementsByTagName('groundspeak:type')[0].firstChild.data
+        if cachetype == 'Traditional Cache':
+            folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+                      icon=folium.features.CustomIcon('icones/2.gif',icon_size=(16,16)),
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(tradi)
+        elif cachetype == 'Unknown Cache':
+            folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+                      icon=folium.features.CustomIcon('icones/8.gif',icon_size=(16,16)),
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(myste)
+        elif cachetype == 'Multi-cache':
+            folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+                      icon=folium.features.CustomIcon('icones/3.gif',icon_size=(16,16)),
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(multi)
+        elif cachetype == 'Letterbox Hybrid':
+            folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+                      icon=folium.features.CustomIcon('icones/5.gif',icon_size=(16,16)),
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(letter)
+        elif cachetype == 'Earthcache':
+            folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+                      icon=folium.features.CustomIcon('icones/earthcache.gif',icon_size=(16,16)),
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(earth)
+        elif cachetype == 'Virtual Cache':
+            folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+                      icon=folium.features.CustomIcon('icones/4.gif',icon_size=(16,16)),
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(virt)
+        elif cachetype == 'Wherigo Cache':
+            folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+                      icon=folium.features.CustomIcon('icones/1858.gif',icon_size=(16,16)),
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(wigo)
+        elif cachetype == 'Event Cache':
+            folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+                      icon=folium.features.CustomIcon('icones/6.gif',icon_size=(16,16)),
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(event)
+        else:
+            folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
                       icon=folium.features.CustomIcon('cache_icon_type_traditional-2.png',icon_size=(14,14)),
-                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(m)
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(other)
+    folium.LayerControl(position='topright', collapsed=False, autoZIndex=True).add_to(m)
     m.save(htmlfile)
 
     
