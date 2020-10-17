@@ -3,6 +3,7 @@ import numpy as np
 from urllib.request import urlopen
 import os.path
 import datetime
+import folium
 
 def sortcaches(Caches):
     """ sort caches by found date and id if same found date"""
@@ -263,3 +264,16 @@ def consecutivedays(Caches):
         maxdaysfinds = currdaysfinds
         maxdaysfindsdate = currdatefinds
     return (maxdaysfinds, maxdaysfindsdate), (maxdaysnofinds, maxdaysnofindsdate)
+
+def cachesonmap(Caches, htmlfile):
+    """ Display caches on an interactive map. Html file is saved in htmlfile """
+
+    m = folium.Map([45.4, 5.6], zoom_start=8, tiles='Stamen Terrain')
+    for cache in Caches:
+        folium.Marker([float(cache.attributes['lat'].value), float(cache.attributes['lon'].value)],
+                      icon=folium.features.CustomIcon('cache_icon_type_traditional-2.png',icon_size=(14,14)),
+                      popup=cache.getElementsByTagName('name')[0].firstChild.data).add_to(m)
+    m.save(htmlfile)
+
+    
+    
