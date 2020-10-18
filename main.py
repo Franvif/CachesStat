@@ -73,7 +73,7 @@ plt.grid(True)
 plt.title('Number of days to find the last 100 caches')
 plt.tight_layout() # to avoid the cut of xticks labels
 plt.savefig('days100caches.png')
-plt.show()
+# plt.show()
 
 listedate,listenbdays = nbdaysfornbcaches(Caches,1000)
 ind = listenbdays.index(min(listenbdays))
@@ -88,5 +88,10 @@ tab1.addchild(dochtml(typedoc='text', content='Maximum consecutive days with fin
 tab1.addchild(dochtml(typedoc='text', content='{0} days (last: {1})'.format(nbdaysfinds,datesuite)))
 tab1.addchild(dochtml(typedoc='text', content='Maximum consecutive days without any finds'))
 tab1.addchild(dochtml(typedoc='text', content='{0} days (last: {1})'.format(nbdaysnofinds,datenosuite)))
+
+# map of found caches
+cachesonmap(Caches, "map.html")
+linkmap = dochtml(typedoc='text',content='<a href="map.html"> Interactive map of found caches </a>')
+doc.addchild(linkmap)
 
 doc.writehtmlfile(fichierhtml)
