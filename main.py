@@ -3,6 +3,7 @@ from xml.dom import minidom
 import matplotlib.pyplot as plt
 import numpy as np
 import datetime
+import webbrowser
 from genhtml import *
 
 fichier = '4662145.gpx'
@@ -95,3 +96,5 @@ linkmap = dochtml(typedoc='text',content='<a href="map.html"> Interactive map of
 doc.addchild(linkmap)
 
 doc.writehtmlfile(fichierhtml)
+
+webbrowser.open(fichierhtml, new=2)
