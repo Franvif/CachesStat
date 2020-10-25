@@ -53,8 +53,41 @@ tab1.addchild(dochtml(typedoc='text', content="{0:.1f} km on {1:s}, {2:.1f} km o
 # stat per type
 dictype = statpercarac(Caches,'groundspeak:type',disp=True)
 dicsize = statpercarac(Caches,'groundspeak:container',disp=True)
-diccountry = statpercarac(Caches,'country',disp=True)
-diccounty = statpercarac(Caches,'county',disp=True)
+
+diccountry = statpercarac(Caches,'country')
+listcountry = sorted([(country[0],nb) for country,nb in diccountry.items()],key=lambda x:x[1], reverse=True)
+doc.addchild(dochtml(typedoc='text',content='<br>'))
+tab_country = dochtml(typedoc='array', content=(1,2))
+doc.addchild(tab_country)
+tab_country.addchild(dochtml(typedoc='text', content='<b>Country</b>'))
+tab_country.addchild(dochtml(typedoc='text', content='<b>Number of found caches</b>'))
+for country,nb in listcountry:
+    tab_country.addchild(dochtml(typedoc='text', content=country))
+    tab_country.addchild(dochtml(typedoc='text', content=str(nb)))
+    
+country01 = listcountry[0][0] # country with the most found caches to display more stat on it
+
+dicstate = statpercarac(Caches,('country','state'))
+liststate_01 = sorted([(state[1],nb) for state,nb in dicstate.items() if state[0]==country01 and state[1]!='carac_unknown'], key=lambda x:x[1], reverse=True)
+doc.addchild(dochtml(typedoc='text',content='<br>'))
+tab_state = dochtml(typedoc='array', content=(1,2))
+doc.addchild(tab_state)
+tab_state.addchild(dochtml(typedoc='text', content='<b>State in {0}</b>'.format(country01)))
+tab_state.addchild(dochtml(typedoc='text', content='<b>Number of found caches</b>'))
+for state,nb in liststate_01:
+    tab_state.addchild(dochtml(typedoc='text', content=state))
+    tab_state.addchild(dochtml(typedoc='text', content=str(nb)))
+
+diccounty = statpercarac(Caches,('country','county'))
+listcounty_01 = sorted([(county[1],nb) for county,nb in diccounty.items() if county[0]==country01 and county[1]!='carac_unknown'], key=lambda x:x[1], reverse=True)
+doc.addchild(dochtml(typedoc='text',content='<br>'))
+tab_county = dochtml(typedoc='array', content=(1,2))
+doc.addchild(tab_county)
+tab_county.addchild(dochtml(typedoc='text', content='<b>County in {0}</b>'.format(country01)))
+tab_county.addchild(dochtml(typedoc='text', content='<b>Number of found caches</b>'))
+for county,nb in listcounty_01:
+    tab_county.addchild(dochtml(typedoc='text', content=county))
+    tab_county.addchild(dochtml(typedoc='text', content=str(nb)))
 
 # number of days for 100 caches
 listedate,listenbdays = nbdaysfornbcaches(Caches,100)
