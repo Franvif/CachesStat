@@ -89,6 +89,25 @@ for county,nb in listcounty_01:
     tab_county.addchild(dochtml(typedoc='text', content=county))
     tab_county.addchild(dochtml(typedoc='text', content=str(nb)))
 
+diccity = statpercarac(Caches, 'city')
+diccity.pop(('carac_unknown',), None)
+list_all = [(city[0], Nb) for city, Nb in diccity.items()]
+dictown = statpercarac(Caches, 'town')
+dictown.pop(('carac_unknown',), None)
+list_all = list_all + [(town[0], Nb) for town, Nb in dictown.items()]
+dicvillage = statpercarac(Caches, 'village')
+dicvillage.pop(('carac_unknown',), None)
+list_all = list_all + [(village[0], Nb) for village, Nb in dicvillage.items()]
+list_all.sort(key=lambda x:x[1], reverse=True)
+doc.addchild(dochtml(typedoc='text',content='<br>'))
+tab_city = dochtml(typedoc='array', content=(1,2))
+doc.addchild(tab_city)
+tab_city.addchild(dochtml(typedoc='text', content='<b>City</b>'))
+tab_city.addchild(dochtml(typedoc='text', content='<b>Number of found caches</b>'))
+for city,nb in list_all[:10]:
+    tab_city.addchild(dochtml(typedoc='text', content=city))
+    tab_city.addchild(dochtml(typedoc='text', content=str(nb)))
+
 # number of days for 100 caches
 listedate,listenbdays = nbdaysfornbcaches(Caches,100)
 ind = listenbdays.index(min(listenbdays))
