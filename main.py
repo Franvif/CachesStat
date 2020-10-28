@@ -25,7 +25,9 @@ removeotherlogs(Caches)
 timezone(Caches)
 
 # add geographic informations (country, ...)
+print('Get geographic information...', sep='')
 gpxaddress(Caches)
+print(' Done')
 
 # total number of caches
 NbCaches = Caches.length
@@ -51,8 +53,30 @@ tab1.addchild(dochtml(typedoc='text', content='Best days'))
 tab1.addchild(dochtml(typedoc='text', content="{0:.1f} km on {1:s}, {2:.1f} km on {3:s}".format(a[-1][2], a[-1][0], a[-2][2], a[-2][0])))
 
 # stat per type
-dictype = statpercarac(Caches,'groundspeak:type',disp=True)
-dicsize = statpercarac(Caches,'groundspeak:container',disp=True)
+dictype = statpercarac(Caches, 'groundspeak:type')
+fig, ax = plt.subplots()
+ax.pie(dictype.values(), labels=['{0} {1:.1f}%'.format(key[0], val*100/NbCaches) for key, val in dictype.items()],
+       labeldistance=None, autopct=lambda x: '{:.1f}%'.format(x) if x > 10 else '')
+ax.axis('equal')
+ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+plt.title('Repartition of found caches types')
+plt.savefig('cachetype.png', bbox_inches="tight")
+fig.tight_layout()
+doc.addchild(dochtml(typedoc='text',content='<br>'))
+tab_pie = dochtml(typedoc='array', content=(1,2))
+doc.addchild(tab_pie)
+tab_pie.addchild(dochtml(typedoc='image', content='cachetype.png'))
+
+dicsize = statpercarac(Caches, 'groundspeak:container')
+figsize, axsize = plt.subplots()
+axsize.pie(dicsize.values(), labels=['{0} {1:.1f}%'.format(key[0], val*100/NbCaches) for key, val in dicsize.items()],
+           labeldistance=None, autopct=lambda x: '{:.1f}%'.format(x) if x > 10 else '')
+axsize.axis('equal')
+axsize.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+plt.title('Repartition of found caches sizes')
+plt.savefig('cachesize.png', bbox_inches="tight")
+figsize.tight_layout()
+tab_pie.addchild(dochtml(typedoc='image', content='cachesize.png'))
 
 diccountry = statpercarac(Caches,'country')
 listcountry = sorted([(country[0],nb) for country,nb in diccountry.items()],key=lambda x:x[1], reverse=True)
@@ -117,6 +141,7 @@ tab1.addchild(dochtml(typedoc='text', content='Last 100 caches'))
 tab1.addchild(dochtml(typedoc='text', content='{0} days ({1})'.format(listenbdays[-1],listedate[-1])))
 date0 = datetime.date(year=int(listedate[0][0:4]), month=int(listedate[0][5:7]), day=int(listedate[0][8:10]))
 listedeltadays = [(datetime.date(year=int(currdate[0:4]), month=int(currdate[5:7]), day=int(currdate[8:10]))-date0).days for currdate in listedate]
+fig2, ax2 = plt.subplots()
 plt.plot(listedeltadays,listenbdays)
 plt.ylabel('Number of days')
 locxticks = np.arange(0,listedeltadays[-1]+1,listedeltadays[-1]/12,dtype=int)
